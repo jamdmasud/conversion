@@ -1,6 +1,7 @@
 //masud start
 //To make a pivot in linq
 //This will helper function
+using System.Collections.Generic;
 public DataTable ConvertGenericListToDatatable(List<object> lstProductID)
 {
 	
