@@ -1,0 +1,12 @@
+You can access the user-management with rabbitmqctl and use the command:
+
+add_user {username} {password}
+or more preferably maybe edit an existing user, or set the permissions for the new user with:
+
+set_permissions [-p vhostpath] {user} {conf} {write} {read}
+For example use the following commands: (it is important to perform these three steps even when creating a new user, if you want to be able to login to the UI console and for your programs to work without facing any permission issues)
+
+rabbitmqctl add_user newadmin s0m3p4ssw0rd
+rabbitmqctl set_user_tags newadmin administrator
+rabbitmqctl set_permissions -p / newadmin ".*" ".*" ".*"
+...to create a new administrator user with full access to the default / vhost.
