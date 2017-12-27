@@ -140,6 +140,17 @@ namespace Suprema
         public byte reserved;
     }
 
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+    public struct BSLogRecord
+    {
+        public byte eventType;
+        public byte subEvent;
+        public ushort tnaEvent;
+        public int eventTime;
+        public uint userID;
+        public uint reserved;
+    };
+
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct BS2FactoryConfig
     {

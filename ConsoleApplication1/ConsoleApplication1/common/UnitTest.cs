@@ -526,7 +526,7 @@ namespace Suprema
         {
             Console.WriteLine("Enter the IP Address to connect device");
             Console.Write(">>>> ");
-            string deviceIpAddress = Console.ReadLine();
+            string deviceIpAddress = "10.200.10.19"; //. Console.ReadLine();
             IPAddress ipAddress;
 
             if (!IPAddress.TryParse(deviceIpAddress, out ipAddress))
@@ -551,6 +551,46 @@ namespace Suprema
             }           
 
             Console.WriteLine(">>>> Successfully connected to the device[{0}].", deviceID);
+
+            Console.Write("Please enter: \n 1. Clear all log. \n 2. Read Log. \n : ");
+            int clear = Util.GetInput();
+            IntPtr logs = new IntPtr();
+            uint numLog = 0;
+
+            if (clear == 1)
+            {
+                result = (BS2ErrorCode)API.BS2_ClearLog(sdkContext, deviceID);
+                if (result == BS2ErrorCode.BS_SDK_SUCCESS) 
+                {
+                    Console.WriteLine("All logs are cleared!");
+                }
+            }
+            else if (clear == 2)
+            {
+                result = (BS2ErrorCode) API.BS2_GetLog(sdkContext, deviceID, 0, 0, out logs,out numLog);
+                if (result == BS2ErrorCode.BS_SDK_SUCCESS)
+                {
+                    List<LogRecords> lstLogRecord = new List<LogRecords>();
+                    LogRecords objlog;
+                    for (int i = 0; i < numLog; i++) // numLog
+                    {
+                        int log = logs.ToInt32();
+                        BS2Event record = (BS2Event)Marshal.PtrToStructure(new IntPtr(log + i * Marshal.SizeOf(typeof(BS2Event))), typeof(BS2Event));
+
+                        objlog = new LogRecords();
+
+                        objlog.AttnTime = new DateTime(1970, 1, 1).AddSeconds(record.dateTime);
+                        //convert byte to int
+                        objlog.UserID = BitConverter.ToUInt32(record.userID, 0);
+                        //convert int to byte
+                        byte[] data = BitConverter.GetBytes(objlog.UserID);
+                        objlog.AttnType = 0;
+                        objlog.DeviceID = Convert.ToInt32(deviceID);
+                        lstLogRecord.Add(objlog);
+                    }
+                }
+            }
+
             return true;
         }
 
@@ -674,5 +714,12 @@ namespace Suprema
             
         }
 
+    }
+    public class LogRecords
+    {
+        public uint UserID { get; set; }
+        public DateTime AttnTime { get; set; }
+        public int DeviceID { get; set; }
+        public Int16 AttnType { get; set; }
     }
 }
