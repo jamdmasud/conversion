@@ -586,11 +586,12 @@ namespace Suprema
                         byte[] data = BitConverter.GetBytes(objlog.UserID);
                         objlog.AttnType = 0;
                         objlog.DeviceID = Convert.ToInt32(deviceID);
+                        Console.Write("1. User ID: {0}, 2. Attendence Time: {1}, 3. Device ID: {2} \n", objlog.UserID.ToString().PadLeft(5), objlog.AttnTime, objlog.DeviceID);
                         lstLogRecord.Add(objlog);
                     }
                 }
             }
-
+            Console.WriteLine();
             return true;
         }
 
