@@ -101,7 +101,7 @@ namespace Suprema
                 if (deviceID != 0)
                 {
                     Console.WriteLine("trying to reconnect Device[{0, 10}].", deviceID);
-                   
+
                     /*
                     BS2ErrorCode result = new BS2ErrorCode();
                     while (result != BS2ErrorCode.BS_SDK_SUCCESS)
@@ -119,7 +119,7 @@ namespace Suprema
 
                     }
                     */
-                    
+
                     /*
                     if (result != BS2ErrorCode.BS_SDK_SUCCESS)
                     {
@@ -133,8 +133,8 @@ namespace Suprema
                             enqueue(deviceID);
                         }
                     }
-                    */            
-                    
+                    */
+
                     //원본
                     BS2ErrorCode result = (BS2ErrorCode)API.BS2_ConnectDevice(sdkContext, deviceID);
                     if (result != BS2ErrorCode.BS_SDK_SUCCESS)
@@ -148,9 +148,9 @@ namespace Suprema
                         {
                             enqueue(deviceID);
                         }
-                    }       
-                    
-                     
+                    }
+
+
                 }
                 else
                 {
@@ -181,16 +181,17 @@ namespace Suprema
         private API.GetServerPrivateKeyFilePath cbGetServerPrivateKeyFilePath = null;
         private API.GetPassword cbGetPassword = null;
         private API.OnErrorOccured cbOnErrorOccured = null;
-        
+
         private string ssl_server_root_crt = "../../../../../resource/server/ssl_server_root.crt";
         private string ssl_server_crt = "../../../../../resource/server/ssl_server.crt";
         private string ssl_server_pem = "../../../../../resource/server/ssl_server.pem";
         private string ssl_server_passwd = "supremaserver";
         private API.OnSendRootCA cbOnSendRootCA = null;
-        
+
         protected abstract void runImpl(UInt32 deviceID);
 
-        protected string Title {
+        protected string Title
+        {
             get
             {
                 return title;
@@ -225,7 +226,7 @@ namespace Suprema
         }
 
         public void run()
-        {            
+        {
             UInt32 deviceID = 0;
             IntPtr versionPtr = API.BS2_Version();
             //bool bSsl = false;
@@ -236,7 +237,7 @@ namespace Suprema
             }
 
             Console.WriteLine("SDK version : " + Marshal.PtrToStringAnsi(versionPtr));
-            
+
             sdkContext = API.BS2_AllocateContext();
             if (sdkContext == IntPtr.Zero)
             {
@@ -268,7 +269,7 @@ namespace Suprema
                 }
 
             }
-            
+
             BS2ErrorCode result = (BS2ErrorCode)API.BS2_Initialize(sdkContext);
             if (result != BS2ErrorCode.BS_SDK_SUCCESS)
             {
@@ -331,13 +332,13 @@ namespace Suprema
                     break;
                 case 3:
                     {
-                        if(deviceIDForServerMode == 0)
+                        if (deviceIDForServerMode == 0)
                         {
                             Console.WriteLine("Waiting for client connection");
                             eventWaitHandle.WaitOne();
                         }
 
-                        
+
                         deviceID = deviceIDForServerMode;
 
                         /*
@@ -362,7 +363,7 @@ namespace Suprema
             }
 
             if (deviceID > 0)
-            {                
+            {
                 Console.Title = String.Format("{0} connected deviceID[{1}]", title, deviceID);
 
 #if !SDK_AUTO_CONNECTION
@@ -437,7 +438,7 @@ namespace Suprema
 
         bool SearchAndConnectDevice(ref UInt32 deviceID)
         {
-            Console.WriteLine("Trying to broadcast on the network");           
+            Console.WriteLine("Trying to broadcast on the network");
 
             BS2ErrorCode result = (BS2ErrorCode)API.BS2_SearchDevices(sdkContext);
             if (result != BS2ErrorCode.BS_SDK_SUCCESS)
@@ -501,8 +502,8 @@ namespace Suprema
                 API.BS2_ReleaseObject(deviceListObj);
                 if (deviceID > 0)
                 {
-                    Console.WriteLine("Trying to connect to device[{0}]", deviceID);                    
-                    result = (BS2ErrorCode)API.BS2_ConnectDevice(sdkContext, deviceID);                    
+                    Console.WriteLine("Trying to connect to device[{0}]", deviceID);
+                    result = (BS2ErrorCode)API.BS2_ConnectDevice(sdkContext, deviceID);
 
                     if (result != BS2ErrorCode.BS_SDK_SUCCESS)
                     {
@@ -524,8 +525,6 @@ namespace Suprema
 
         bool ConnectToDevice(ref UInt32 deviceID)
         {
-            Console.WriteLine("Enter the IP Address to connect device");
-            Console.Write(">>>> ");
             string deviceIpAddress = "10.200.10.19"; //. Console.ReadLine();
             IPAddress ipAddress;
 
@@ -534,40 +533,38 @@ namespace Suprema
                 Console.WriteLine("Invalid ip : " + deviceIpAddress);
                 return false;
             }
-
-            Console.WriteLine("Enter the port number to connect device : default[{0}]", BS2Envirionment.BS2_TCP_DEVICE_PORT_DEFAULT);
-            Console.Write(">>>> ");
-            UInt16 port = Util.GetInput((UInt16)BS2Envirionment.BS2_TCP_DEVICE_PORT_DEFAULT);
+            //Port from default port
+            UInt16 port = BS2Envirionment.BS2_TCP_DEVICE_PORT_DEFAULT;
 
             Console.WriteLine("Trying to connect to device [ip :{0}, port : {1}]", deviceIpAddress, port);
 
-           
+
             BS2ErrorCode result = (BS2ErrorCode)API.BS2_ConnectDeviceViaIP(sdkContext, deviceIpAddress, port, out deviceID);
 
             if (result != BS2ErrorCode.BS_SDK_SUCCESS)
             {
                 Console.WriteLine("Can't connect to device(errorCode : {0}).", result);
                 return false;
-            }           
+            }
 
             Console.WriteLine(">>>> Successfully connected to the device[{0}].", deviceID);
 
-            Console.Write("Please enter: \n 1. Clear all log. \n 2. Read Log. \n : ");
-            int clear = Util.GetInput();
+            Console.Write("Please enter: \n 1. Clear all log. \n 2. Read Log. \n 3. Scan finger. \n : ");
+            int input = Util.GetInput();
             IntPtr logs = new IntPtr();
             uint numLog = 0;
 
-            if (clear == 1)
+            if (input == 1)
             {
                 result = (BS2ErrorCode)API.BS2_ClearLog(sdkContext, deviceID);
-                if (result == BS2ErrorCode.BS_SDK_SUCCESS) 
+                if (result == BS2ErrorCode.BS_SDK_SUCCESS)
                 {
                     Console.WriteLine("All logs are cleared!");
                 }
             }
-            else if (clear == 2)
+            else if (input == 2)
             {
-                result = (BS2ErrorCode) API.BS2_GetLog(sdkContext, deviceID, 0, 0, out logs,out numLog);
+                result = (BS2ErrorCode)API.BS2_GetLog(sdkContext, deviceID, 0, 0, out logs, out numLog);
                 if (result == BS2ErrorCode.BS_SDK_SUCCESS)
                 {
                     List<LogRecords> lstLogRecord = new List<LogRecords>();
@@ -591,12 +588,74 @@ namespace Suprema
                     }
                 }
             }
+            else if (input == 3)
+            {
+                uint deviceId = 1;
+                BS2SimpleDeviceInfo deviceInfo;
+                BS2UserBlob userBlob;
+                BS2Fingerprint fingerprintList = new BS2Fingerprint();
+                uint fingerprintQuality = 0;
+                byte fingerprintFormat = 0;
+                result = (BS2ErrorCode) API.BS2_GetDeviceInfo(sdkContext, deviceID, out deviceInfo);
+                if (result == BS2ErrorCode.BS_SDK_SUCCESS)
+                {
+                    if (deviceInfo.fingerSupported == 1)
+                    {
+                        int idx = 0;
+                        uint templateIndex = 0;
+
+                        result = BS2ErrorCode.BS_SDK_SUCCESS;
+                        for (; idx < BS2Envirionment.BS2_MAX_NUM_OF_FINGER_PER_USER; idx++)
+                        {
+                            for (templateIndex = 0; templateIndex < BS2Envirionment.BS2_TEMPLATE_PER_FINGER; )
+                            {
+
+                                result = (BS2ErrorCode)API.BS2_ScanFingerprint(sdkContext, deviceID, ref fingerprintList, 1, fingerprintQuality, fingerprintFormat, null);
+                                if (result != BS2ErrorCode.BS_SDK_SUCCESS)
+                                {
+
+                                }
+                                else
+                                {
+                                    templateIndex++;
+                                }
+                            }
+
+                            if (result != BS2ErrorCode.BS_SDK_SUCCESS)
+                            {
+                                break;
+                            }
+                        }
+
+                        if (result == BS2ErrorCode.BS_SDK_SUCCESS)
+                        {
+                            result = (BS2ErrorCode)API.BS2_VerifyFingerprint(sdkContext, deviceId, ref fingerprintList);
+                            if (result == BS2ErrorCode.BS_SDK_SUCCESS)
+                            {
+                                userBlob.user.numFingers = (byte)idx;
+                                IntPtr fingerObjs = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(BS2Fingerprint)));
+                                Marshal.StructureToPtr(fingerprintList, fingerObjs, false);
+                                userBlob.fingerObjs = fingerObjs;
+                            }
+                            else
+                            {
+                                if (result == BS2ErrorCode.BS_SDK_ERROR_NOT_SAME_FINGERPRINT)
+                                {
+                                    Console.WriteLine("The fingerprint doesn't match.\n");
+                                }
+
+                                //TODO handle error
+                            }
+                        }
+                    }
+                }
+            }
             Console.WriteLine();
             return true;
         }
 
         bool ConnectToDeviceSSL(string deviceIpAddress, ref UInt32 deviceID)
-        {                
+        {
             UInt16 port = Util.GetInput((UInt16)BS2Envirionment.BS2_TCP_DEVICE_PORT_DEFAULT);
 
             int nCnt = 0;
@@ -604,7 +663,7 @@ namespace Suprema
             {
                 BS2ErrorCode result = (BS2ErrorCode)API.BS2_ConnectDeviceViaIP(sdkContext, deviceIpAddress, port, out deviceID);
 
-                if(nCnt > 7)
+                if (nCnt > 7)
                 {
                     Console.WriteLine("Can't connect to device(errorCode : {0}).", result);
                     return false;
@@ -621,7 +680,7 @@ namespace Suprema
 
             Console.WriteLine(">>>> Successfully connected to the device[{0}].", deviceID);
             return true;
-        }       
+        }
 
         void PrintDeviceInfo(BS2SimpleDeviceInfo deviceInfo)
         {
@@ -712,7 +771,7 @@ namespace Suprema
                 Console.WriteLine("send RootCA Success!!\n");
             else
                 Console.WriteLine("send RootCA Fail!!\n");
-            
+
         }
 
     }
