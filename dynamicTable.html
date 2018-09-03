@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<head>
+	<title>dynamic table</title>
+<script>
+function addAttachment(){
+		var table = document.getElementById("fileTable");
+		var inputName = document.getElementById("fileName").value;
+		var len = table.rows.length; 
+		var row = table.insertRow(len);
+		var fileNameCell = row.insertCell(0);
+		var fileCell = row.insertCell(1);
+		
+		fileNameCell.innerHTML = inputName;
+		fileCell.innerHTML = '<input type="file" name="'+inputName+'" />';
+		
+		document.getElementById("fileName").value = '';
+	}
+</script>
+
+</head>
+<body>
+	<input type="text" id="fileName" />
+	<button type="button"  onclick="add()" >Add</button>
+	
+	<table id="fileTable">
+		
+		<thead>
+			<th>FileName</th>
+			<th>File</th>
+		</thead>
+		<tbody></tbody>
+    </table>
+</body>
