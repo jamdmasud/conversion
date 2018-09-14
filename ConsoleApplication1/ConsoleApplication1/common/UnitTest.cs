@@ -525,6 +525,7 @@ namespace Suprema
 
         bool ConnectToDevice(ref UInt32 deviceID)
         {
+            
             string deviceIpAddress = "10.200.10.19"; //. Console.ReadLine();
             IPAddress ipAddress;
 
